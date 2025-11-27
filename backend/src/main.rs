@@ -4,7 +4,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
 struct Todo {
-    userId: u32,
+    #[serde(rename = "userId")]
+    user_id: u32,
     id: u32,
     title: String,
     completed: bool,
@@ -24,8 +25,6 @@ async fn todos() -> impl Responder {
         HttpResponse::InternalServerError().body("Kunde inte hämta data")
     }
 }
-
-// Startar Actix-web servern
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
