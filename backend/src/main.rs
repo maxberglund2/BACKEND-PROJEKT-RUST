@@ -1,42 +1,49 @@
-use actix_web::{App, HttpResponse, HttpServer, Responder, get};
+mod db;
+mod models;
+mod routes;
+
+use actix_web::{App, HttpServer};
 use actix_cors::Cors;
-use serde::{Deserialize, Serialize};
-
-#[derive(Deserialize, Serialize)]
-struct Todo {
-    #[serde(rename = "userId")]
-    user_id: u32,
-    id: u32,
-    title: String,
-    completed: bool,
-}
-
-#[get("/todos")]
-async fn todos() -> impl Responder {
-    let resp = reqwest::get("https://jsonplaceholder.typicode.com/todos/").await;
-
-    if let Ok(response) = resp {
-        if let Ok(todos) = response.json::<Vec<Todo>>().await {
-            HttpResponse::Ok().json(&todos)
-        } else {
-            HttpResponse::InternalServerError().body("Kunde inte parsa JSON")
-        }
-    } else {
-        HttpResponse::InternalServerError().body("Kunde inte hämta data")
-    }
-}
+use dotenv::dotenv;
+use std::env;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    dotenv().ok();
+    
+    let database_url = env::var("DATABASE_URL")
+        .expect("DATABASE_URL must be set in .env file");
+    
+    // Create database pool
+    let pool = db::create_pool(&database_url)
+        .await
+        .expect("Failed to create database pool");
+    
+    // Run migrations
+    sqlx::migrate!("./migrations")
+        .run(&pool)
+        .await
+        .expect("Failed to run migrations");
+    
+    println!("Server running at http://127.0.0.1:8081");
+    
+    HttpServer::new(move || {
         App::new()
+            .app_data(actix_web::web::Data::new(pool.clone()))
             .wrap(
                 Cors::default()
                     .allow_any_origin()
                     .allow_any_method()
                     .allow_any_header()
             )
-            .service(todos)
+            // Public API route (original todos endpoint)
+            .service(routes::public::public_todos)
+            // CRUD routes for database todos
+            .service(routes::todos::create_todo)
+            .service(routes::todos::get_all_todos)
+            .service(routes::todos::get_todo_by_id)
+            .service(routes::todos::update_todo)
+            .service(routes::todos::delete_todo)
     })
     .bind(("127.0.0.1", 8081))?
     .run()
