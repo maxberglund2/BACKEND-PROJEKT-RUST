@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: weather
+      POSTGRES_DB: rust_todo
       LANG: en_US.utf8
       LC_ALL: en_US.utf8
     ports:

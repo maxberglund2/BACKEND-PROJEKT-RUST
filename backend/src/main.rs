@@ -46,7 +46,7 @@ async fn main() -> std::io::Result<()> {
             .service(routes::todos::delete_todo)
             // CRUD routes for systems
             .service(routes::system::create_system)
-            .service(routes::system::get_all_systems)
+            .service(routes::system::get_user_systems)
             .service(routes::system::update_system)
             .service(routes::system::delete_system)
             // Authentication routes
