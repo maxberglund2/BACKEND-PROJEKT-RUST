@@ -1,209 +1,190 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { ChevronRight, CheckSquare, Zap, Shield, Layout } from "lucide-react";
 
-type Todo = {
-  id: number;
-  userId: number;
-  title: string;
-  completed: boolean;
-};
-
-export default function Home() {
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [newTitle, setNewTitle] = useState("");
-  const [editTodo, setEditTodo] = useState<Todo | null>(null);
-  const [editTitle, setEditTitle] = useState("");
-  const [editCompleted, setEditCompleted] = useState(false);
-
-  // Fetch todos from your backend
-  const fetchTodos = () => {
-    setLoading(true);
-    fetch("http://localhost:8081/api/todos")
-      .then((res) => res.json())
-      .then((data) => {
-        setTodos(data);
-        setLoading(false);
-      });
-  };
+export default function HomePage() {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    fetchTodos();
+    setIsVisible(true);
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Create
-  const addTodo = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTitle.trim()) return;
-    await fetch("http://localhost:8081/api/todos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: 1, title: newTitle, completed: false }),
-    });
-    setNewTitle("");
-    fetchTodos();
-  };
-
-  // Update (toggle completed)
-  const toggleTodo = async (todo: Todo) => {
-    setEditTodo(todo);
-    setEditTitle(todo.title);
-    setEditCompleted(todo.completed);
-  };
-
-  // Save edit
-  const saveEdit = async () => {
-    if (!editTodo) return;
-    await fetch(`http://localhost:8081/api/todos/${editTodo.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: editTitle, completed: editCompleted }),
-    });
-    setEditTodo(null);
-    fetchTodos();
-  };
-
-  // Delete
-  const deleteTodo = async (id: number) => {
-    await fetch(`http://localhost:8081/api/todos/${id}`, { method: "DELETE" });
-    fetchTodos();
-  };
-
-  if (loading)
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <span className="text-lg text-gray-500">Laddar...</span>
-      </div>
-    );
-
   return (
-    <main className="max-w-2xl mx-auto py-12 px-4 min-h-screen bg-linear-to-br from-blue-50 to-purple-50">
-      <h1 className="text-4xl font-extrabold mb-8 text-center text-gray-900 tracking-tight">
-        Mina Todos <span className="text-blue-500">(Rust-backend)</span>
-      </h1>
-      <form
-        onSubmit={addTodo}
-        className="flex gap-3 mb-8 bg-white rounded-xl shadow p-4"
-      >
-        <input
-          className="flex-1 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          placeholder="Ny todo..."
-        />
-        <button
-          className="bg-linear-to-br from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg font-semibold shadow hover:from-blue-600 hover:to-purple-600 transition"
-          type="submit"
-        >
-          Lägg till
-        </button>
-      </form>
-      <ul className="space-y-5">
-        {todos.map((todo) => (
-          <li
-            key={todo.id}
-            className={`flex items-center justify-between p-5 rounded-2xl shadow-lg border transition group cursor-pointer
-              ${
-                todo.completed
-                  ? "bg-green-50 border-green-200 hover:border-green-400"
-                  : "bg-yellow-50 border-yellow-200 hover:border-yellow-400"
-              }
-            `}
-            onClick={() => toggleTodo(todo)}
-            title="Klicka för att redigera"
-          >
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-xs text-gray-400">
-                #{todo.id}
-              </span>
-              <span
-                className={`font-medium text-lg transition ${
-                  todo.completed
-                    ? "line-through text-green-700"
-                    : "text-yellow-700 group-hover:text-yellow-900"
-                }`}
-              >
-                {todo.title}
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-semibold shadow ${
-                  todo.completed
-                    ? "bg-green-200 text-green-800"
-                    : "bg-yellow-200 text-yellow-800"
-                }`}
-              >
-                {todo.completed ? "Klar" : "Ej klar"}
-              </span>
-              <button
-                className="ml-2 text-red-400 hover:text-red-600 text-lg px-2 py-1 rounded transition"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteTodo(todo.id);
-                }}
-                title="Ta bort"
-              >
-                ✕
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+    <div className="min-h-screen bg-gradient-to-br from-[#31364F] via-[#435663] to-[#31364F] relative overflow-hidden">
+      {/* Animated background orbs */}
+      <div
+        className="absolute w-96 h-96 bg-[#A3B087] rounded-full blur-3xl opacity-20 transition-all duration-1000 ease-out"
+        style={{
+          left: `${mousePos.x * 0.02}px`,
+          top: `${mousePos.y * 0.02}px`,
+        }}
+      />
+      <div
+        className="absolute right-0 bottom-0 w-[600px] h-[600px] bg-[#FFF8D4] rounded-full blur-3xl opacity-10 transition-all duration-1000 ease-out"
+        style={{
+          right: `${-mousePos.x * 0.01}px`,
+          bottom: `${-mousePos.y * 0.01}px`,
+        }}
+      />
 
-      {/* Modal for editing */}
-      {editTodo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative animate-fade-in">
-            <button
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl"
-              onClick={() => setEditTodo(null)}
-              title="Stäng"
+      {/* Grid overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(163,176,135,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(163,176,135,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
+
+      {/* Content */}
+      <div className="relative z-10 min-h-screen flex flex-col">
+        {/* Header */}
+        <header className="p-6 flex justify-between items-center">
+          <div
+            className={`flex items-center gap-2 transition-all duration-700 ${
+              isVisible
+                ? "translate-x-0 opacity-100"
+                : "-translate-x-10 opacity-0"
+            }`}
+          >
+            <CheckSquare
+              className="text-[#A3B087]"
+              size={32}
+              strokeWidth={2.5}
+            />
+            <span className="text-2xl font-bold text-[#FFF8D4] tracking-tight">
+              SystemFlow
+            </span>
+          </div>
+          <div
+            className={`flex gap-4 transition-all duration-700 delay-100 ${
+              isVisible
+                ? "translate-x-0 opacity-100"
+                : "translate-x-10 opacity-0"
+            }`}
+          >
+            <a
+              href="/auth/sign-in"
+              className="px-5 py-2 text-[#FFF8D4] hover:text-white transition-colors font-medium"
             >
-              ×
-            </button>
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">
-              Redigera Todo
-            </h2>
-            <div className="mb-4">
-              <label className="block text-gray-600 mb-1">Titel</label>
-              <input
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                autoFocus
-              />
+              Sign In
+            </a>
+            <a
+              href="/auth/sign-up"
+              className="px-5 py-2 bg-[#A3B087] text-[#31364F] rounded-lg hover:bg-[#b5c59a] transition-all font-semibold shadow-lg hover:shadow-xl hover:scale-105"
+            >
+              Sign Up
+            </a>
+          </div>
+        </header>
+
+        {/* Hero Section */}
+        <main className="flex-1 flex items-center justify-center px-6">
+          <div className="max-w-5xl mx-auto text-center">
+            <div
+              className={`transition-all duration-1000 ${
+                isVisible
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-10 opacity-0"
+              }`}
+            >
+              <h1 className="text-6xl md:text-7xl font-bold text-[#FFF8D4] mb-6 leading-tight">
+                Organize Your World,
+                <br />
+                <span className="text-[#A3B087]">One System at a Time</span>
+              </h1>
+              <p className="text-xl text-[#FFF8D4]/80 mb-12 max-w-2xl mx-auto leading-relaxed">
+                Create powerful todo systems tailored to your workflow. Start
+                with a curated default system or build your own from scratch.
+                Full CRUD control at your fingertips.
+              </p>
             </div>
-            <div className="mb-6 flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={editCompleted}
-                onChange={(e) => setEditCompleted(e.target.checked)}
-                id="edit-completed"
-                className="accent-blue-500 w-5 h-5"
-              />
-              <label htmlFor="edit-completed" className="text-gray-700">
-                Klar
-              </label>
+
+            {/* Feature Cards */}
+            <div
+              className={`grid md:grid-cols-3 gap-6 mb-12 transition-all duration-1000 delay-200 ${
+                isVisible
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-10 opacity-0"
+              }`}
+            >
+              <div className="bg-[#435663]/30 backdrop-blur-sm p-6 rounded-xl border border-[#A3B087]/20 hover:border-[#A3B087]/50 transition-all hover:transform hover:scale-105">
+                <Zap className="text-[#A3B087] mb-3 mx-auto" size={32} />
+                <h3 className="text-[#FFF8D4] font-semibold mb-2">
+                  Instant Start
+                </h3>
+                <p className="text-[#FFF8D4]/70 text-sm">
+                  Get a pre-configured system with sample todos to jumpstart
+                  your productivity
+                </p>
+              </div>
+              <div className="bg-[#435663]/30 backdrop-blur-sm p-6 rounded-xl border border-[#A3B087]/20 hover:border-[#A3B087]/50 transition-all hover:transform hover:scale-105">
+                <Layout className="text-[#A3B087] mb-3 mx-auto" size={32} />
+                <h3 className="text-[#FFF8D4] font-semibold mb-2">
+                  Custom Systems
+                </h3>
+                <p className="text-[#FFF8D4]/70 text-sm">
+                  Design your own systems with unlimited todos tailored to your
+                  unique needs
+                </p>
+              </div>
+              <div className="bg-[#435663]/30 backdrop-blur-sm p-6 rounded-xl border border-[#A3B087]/20 hover:border-[#A3B087]/50 transition-all hover:transform hover:scale-105">
+                <Shield className="text-[#A3B087] mb-3 mx-auto" size={32} />
+                <h3 className="text-[#FFF8D4] font-semibold mb-2">
+                  Full Control
+                </h3>
+                <p className="text-[#FFF8D4]/70 text-sm">
+                  Complete CRUD operations on all your systems and todos with
+                  ease
+                </p>
+              </div>
             </div>
-            <div className="flex justify-end gap-3">
-              <button
-                className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
-                onClick={() => setEditTodo(null)}
+
+            {/* CTA Button */}
+            <div
+              className={`transition-all duration-1000 delay-300 ${
+                isVisible
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-10 opacity-0"
+              }`}
+            >
+              <a
+                href="/system"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#A3B087] to-[#b5c59a] text-[#31364F] rounded-xl hover:shadow-2xl transition-all font-bold text-lg hover:scale-110 group"
               >
-                Avbryt
-              </button>
-              <button
-                className="px-5 py-2 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600 transition"
-                onClick={saveEdit}
-              >
-                Spara
-              </button>
+                Enter Your System
+                <ChevronRight
+                  className="group-hover:translate-x-1 transition-transform"
+                  size={24}
+                />
+              </a>
+              <p className="text-[#FFF8D4]/60 text-sm mt-4">
+                No credit card required • Free to start
+              </p>
             </div>
           </div>
-        </div>
-      )}
-    </main>
+        </main>
+
+        {/* Footer */}
+        <footer className="p-6 text-center text-[#FFF8D4]/50 text-sm">
+          <p>© 2024 SystemFlow. Built for productivity enthusiasts.</p>
+        </footer>
+      </div>
+
+      {/* Floating particles */}
+      {[...Array(20)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-1 h-1 bg-[#A3B087] rounded-full opacity-30 animate-pulse"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 3}s`,
+            animationDuration: `${2 + Math.random() * 3}s`,
+          }}
+        />
+      ))}
+    </div>
   );
 }

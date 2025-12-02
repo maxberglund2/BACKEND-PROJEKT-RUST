@@ -10,13 +10,12 @@ async fn update_system(
 ) -> impl Responder {
     let system_id = id.into_inner();
 
-    // Build dynamic query based on what fields are provided
     let result = sqlx::query_as::<_, System>(
         "UPDATE systems 
          SET name = COALESCE($1, name),
              updated_at = CURRENT_TIMESTAMP
          WHERE id = $2
-         RETURNING id, name, user_id"
+         RETURNING id, name, user_id, is_default"
     )
     .bind(&system.name)
     .bind(system_id)

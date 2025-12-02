@@ -6,15 +6,16 @@ pub struct Todo {
     pub id: i32,
     #[serde(rename = "userId")]
     pub user_id: i32,
+    pub system_id: i32,
     pub title: String,
     pub completed: bool,
-    pub system_id: i32,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct CreateTodo {
     #[serde(rename = "userId")]
     pub user_id: i32,
+    pub system_id: i32,
     pub title: String,
     #[serde(default)]
     pub completed: bool,

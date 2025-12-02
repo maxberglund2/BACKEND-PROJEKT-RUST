@@ -8,9 +8,12 @@ async fn create_todo(
     todo: web::Json<CreateTodo>,
 ) -> impl Responder {
     let result = sqlx::query_as::<_, Todo>(
-        "INSERT INTO todos (user_id, title, completed) VALUES ($1, $2, $3) RETURNING id, user_id, title, completed"
+        "INSERT INTO todos (user_id, system_id, title, completed) 
+         VALUES ($1, $2, $3, $4) 
+         RETURNING id, user_id, system_id, title, completed"
     )
     .bind(todo.user_id)
+    .bind(todo.system_id)
     .bind(&todo.title)
     .bind(todo.completed)
     .fetch_one(pool.get_ref())

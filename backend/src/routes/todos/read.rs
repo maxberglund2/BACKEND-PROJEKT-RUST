@@ -4,9 +4,13 @@ use crate::models::todo::Todo;
 
 #[get("/api/todos")]
 async fn get_all_todos(pool: web::Data<Pool<Postgres>>) -> impl Responder {
-    let result = sqlx::query_as::<_, Todo>("SELECT id, user_id, title, completed FROM todos ORDER BY id")
-        .fetch_all(pool.get_ref())
-        .await;
+    let result = sqlx::query_as::<_, Todo>(
+        "SELECT id, user_id, system_id, title, completed 
+         FROM todos 
+         ORDER BY id"
+    )
+    .fetch_all(pool.get_ref())
+    .await;
 
     match result {
         Ok(todos) => HttpResponse::Ok().json(todos),
@@ -23,7 +27,9 @@ async fn get_todo_by_id(
     id: web::Path<i32>,
 ) -> impl Responder {
     let result = sqlx::query_as::<_, Todo>(
-        "SELECT id, user_id, title, completed FROM todos WHERE id = $1"
+        "SELECT id, user_id, system_id, title, completed 
+         FROM todos 
+         WHERE id = $1"
     )
     .bind(id.into_inner())
     .fetch_one(pool.get_ref())
@@ -35,6 +41,30 @@ async fn get_todo_by_id(
         Err(e) => {
             eprintln!("Database error: {:?}", e);
             HttpResponse::InternalServerError().body("Failed to fetch todo")
+        }
+    }
+}
+
+#[get("/api/systems/{system_id}/todos")]
+async fn get_system_todos(
+    pool: web::Data<Pool<Postgres>>,
+    system_id: web::Path<i32>,
+) -> impl Responder {
+    let result = sqlx::query_as::<_, Todo>(
+        "SELECT id, user_id, system_id, title, completed 
+         FROM todos 
+         WHERE system_id = $1 
+         ORDER BY id"
+    )
+    .bind(*system_id)
+    .fetch_all(pool.get_ref())
+    .await;
+
+    match result {
+        Ok(todos) => HttpResponse::Ok().json(todos),
+        Err(e) => {
+            eprintln!("Database error: {:?}", e);
+            HttpResponse::InternalServerError().body("Failed to fetch todos")
         }
     }
 }

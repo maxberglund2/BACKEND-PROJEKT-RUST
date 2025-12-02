@@ -8,7 +8,10 @@ async fn get_user_systems(
     user_id: web::Path<i32>,
 ) -> impl Responder {
     let result = sqlx::query_as::<_, System>(
-        "SELECT id, name, user_id FROM systems WHERE user_id = $1 ORDER BY id",
+        "SELECT id, name, user_id, is_default 
+         FROM systems 
+         WHERE user_id = $1 
+         ORDER BY is_default DESC, id",
     )
     .bind(*user_id)
     .fetch_all(pool.get_ref())
@@ -19,6 +22,30 @@ async fn get_user_systems(
         Err(e) => {
             eprintln!("Database error: {:?}", e);
             HttpResponse::InternalServerError().body("Failed to fetch systems")
+        }
+    }
+}
+
+#[get("/api/systems/{user_id}/default")]
+async fn get_default_system(
+    pool: web::Data<Pool<Postgres>>,
+    user_id: web::Path<i32>,
+) -> impl Responder {
+    let result = sqlx::query_as::<_, System>(
+        "SELECT id, name, user_id, is_default 
+         FROM systems 
+         WHERE user_id = $1 AND is_default = TRUE",
+    )
+    .bind(*user_id)
+    .fetch_optional(pool.get_ref())
+    .await;
+
+    match result {
+        Ok(Some(system)) => HttpResponse::Ok().json(system),
+        Ok(None) => HttpResponse::NotFound().body("No default system found"),
+        Err(e) => {
+            eprintln!("Database error: {:?}", e);
+            HttpResponse::InternalServerError().body("Failed to fetch default system")
         }
     }
 }

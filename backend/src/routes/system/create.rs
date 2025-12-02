@@ -8,10 +8,13 @@ async fn create_system(
     system: web::Json<CreateSystem>,
 ) -> impl Responder {
     let result = sqlx::query_as::<_, System>(
-        "INSERT INTO systems (name, user_id) VALUES ($1, $2) RETURNING id, name, user_id"
+        "INSERT INTO systems (name, user_id, is_default) 
+         VALUES ($1, $2, $3) 
+         RETURNING id, name, user_id, is_default"
     )
     .bind(&system.name)
     .bind(system.user_id)
+    .bind(system.is_default)
     .fetch_one(pool.get_ref())
     .await;
 

@@ -36,22 +36,27 @@ async fn main() -> std::io::Result<()> {
                     .allow_any_method()
                     .allow_any_header()
             )
-            // Public API route (original todos endpoint)
+            // Public API route
             .service(routes::public::public_todos)
-            // CRUD routes for database todos
-            .service(routes::todos::create_todo)
-            .service(routes::todos::get_all_todos)
-            .service(routes::todos::get_todo_by_id)
-            .service(routes::todos::update_todo)
-            .service(routes::todos::delete_todo)
-            // CRUD routes for systems
-            .service(routes::system::create_system)
-            .service(routes::system::get_user_systems)
-            .service(routes::system::update_system)
-            .service(routes::system::delete_system)
+            
             // Authentication routes
             .service(routes::auth::signup_user)
             .service(routes::auth::signin_user)
+            
+            // System routes
+            .service(routes::system::create_system)
+            .service(routes::system::get_user_systems)
+            .service(routes::system::get_default_system)
+            .service(routes::system::update_system)
+            .service(routes::system::delete_system)
+            
+            // Todo routes
+            .service(routes::todos::create_todo)
+            .service(routes::todos::get_all_todos)
+            .service(routes::todos::get_todo_by_id)
+            .service(routes::todos::get_system_todos)
+            .service(routes::todos::update_todo)
+            .service(routes::todos::delete_todo)
     })
     .bind(("127.0.0.1", 8081))?
     .run()
