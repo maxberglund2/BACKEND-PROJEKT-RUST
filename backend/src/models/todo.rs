@@ -8,6 +8,7 @@ pub struct Todo {
     pub user_id: i32,
     pub title: String,
     pub completed: bool,
+    pub system_id: i32,
 }
 
 #[derive(Debug, Deserialize)]

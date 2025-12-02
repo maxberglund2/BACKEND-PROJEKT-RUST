@@ -44,6 +44,14 @@ async fn main() -> std::io::Result<()> {
             .service(routes::todos::get_todo_by_id)
             .service(routes::todos::update_todo)
             .service(routes::todos::delete_todo)
+            // CRUD routes for systems
+            .service(routes::system::create_system)
+            .service(routes::system::get_all_systems)
+            .service(routes::system::update_system)
+            .service(routes::system::delete_system)
+            // Authentication routes
+            .service(routes::auth::signup_user)
+            .service(routes::auth::signin_user)
     })
     .bind(("127.0.0.1", 8081))?
     .run()
