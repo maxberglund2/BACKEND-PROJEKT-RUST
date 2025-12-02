@@ -78,7 +78,7 @@ export default function Home() {
     );
 
   return (
-    <main className="max-w-2xl mx-auto py-12 px-4 min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+    <main className="max-w-2xl mx-auto py-12 px-4 min-h-screen bg-linear-to-br from-blue-50 to-purple-50">
       <h1 className="text-4xl font-extrabold mb-8 text-center text-gray-900 tracking-tight">
         Mina Todos <span className="text-blue-500">(Rust-backend)</span>
       </h1>
@@ -93,7 +93,7 @@ export default function Home() {
           placeholder="Ny todo..."
         />
         <button
-          className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg font-semibold shadow hover:from-blue-600 hover:to-purple-600 transition"
+          className="bg-linear-to-br from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg font-semibold shadow hover:from-blue-600 hover:to-purple-600 transition"
           type="submit"
         >
           Lägg till
