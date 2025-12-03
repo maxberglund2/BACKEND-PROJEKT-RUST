@@ -3,7 +3,12 @@ use sqlx::{Pool, Postgres};
 use crate::models::todo::Todo;
 
 #[get("/api/todos")]
+
+// Fetch all todos
 async fn get_all_todos(pool: web::Data<Pool<Postgres>>) -> impl Responder {
+    // Defines how to convert into a HTTP response
+
+    // Query all todos from the database
     let result = sqlx::query_as::<_, Todo>(
         "SELECT id, user_id, system_id, title, completed 
          FROM todos 
@@ -21,11 +26,15 @@ async fn get_all_todos(pool: web::Data<Pool<Postgres>>) -> impl Responder {
     }
 }
 
+// Fetch a todo by its ID
 #[get("/api/todos/{id}")]
 async fn get_todo_by_id(
     pool: web::Data<Pool<Postgres>>,
     id: web::Path<i32>,
 ) -> impl Responder {
+    // Defines how to convert into a HTTP response
+
+    // Query the todo from the database by its ID
     let result = sqlx::query_as::<_, Todo>(
         "SELECT id, user_id, system_id, title, completed 
          FROM todos 
@@ -35,7 +44,9 @@ async fn get_todo_by_id(
     .fetch_one(pool.get_ref())
     .await;
 
+    // Handle the result of the query
     match result {
+        // Check if the todo was found, if so return it as JSON
         Ok(todo) => HttpResponse::Ok().json(todo),
         Err(sqlx::Error::RowNotFound) => HttpResponse::NotFound().body("Todo not found"),
         Err(e) => {
@@ -45,11 +56,15 @@ async fn get_todo_by_id(
     }
 }
 
+// Fetch todos by system ID, todos in a specific system
 #[get("/api/systems/{system_id}/todos")]
 async fn get_system_todos(
     pool: web::Data<Pool<Postgres>>,
     system_id: web::Path<i32>,
 ) -> impl Responder {
+    // Defines how to convert into a HTTP response
+
+    // Query todos from the database by system ID
     let result = sqlx::query_as::<_, Todo>(
         "SELECT id, user_id, system_id, title, completed 
          FROM todos 
@@ -60,6 +75,7 @@ async fn get_system_todos(
     .fetch_all(pool.get_ref())
     .await;
 
+    // Handle the result of the query
     match result {
         Ok(todos) => HttpResponse::Ok().json(todos),
         Err(e) => {

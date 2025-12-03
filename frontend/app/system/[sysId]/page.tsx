@@ -38,10 +38,27 @@ export default function SystemDetailPage() {
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const [system, setSystem] = useState<System | null>(null);
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [userId, setUserId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     completed: false,
   });
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        if (parsedUser && parsedUser.id) {
+          const id = Number(parsedUser.id);
+          setUserId(id);
+          setFormData((prev) => ({ ...prev, user_id: id }));
+        }
+      } catch (e) {
+        console.error("Failed to parse user from localStorage:", e);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     // Check if user is signed in
@@ -52,13 +69,20 @@ export default function SystemDetailPage() {
     }
 
     setIsVisible(true);
-    fetchSystem();
+
+    // Only fetch system when userId is available
+    if (userId) {
+      fetchSystem();
+    }
+
     fetchTodos();
-  }, []);
+  }, [userId]); // Add userId as dependency
 
   const fetchSystem = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8081/api/systems/1"); // TODO: Replace with actual user ID
+      const response = await fetch(
+        `http://127.0.0.1:8081/api/systems/${userId}`
+      );
       if (response.ok) {
         const data = await response.json();
         const currentSystem = data.find(
@@ -120,7 +144,7 @@ export default function SystemDetailPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: 1,
+            userId: userId, // Use the actual userId from state
             system_id: parseInt(systemId),
             title: formData.title,
             completed: formData.completed,

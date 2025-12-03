@@ -25,7 +25,7 @@ async fn main() -> std::io::Result<()> {
         .await
         .expect("Failed to run migrations");
     
-    println!("Server running at http://127.0.0.1:8081");
+    println!("Server is finnaly running!!!!!!!!!");
     
     HttpServer::new(move || {
         App::new()

@@ -37,14 +37,15 @@ export default function SystemsPage() {
       }
     }
   }, []);
-    useEffect(() => {
-      // Check if user is signed in
-      const user = localStorage.getItem("user");
-      if (!user) {
-        router.push("/auth/sign-in");
-        return;
-      }
-    }, []);
+  
+  useEffect(() => {
+    // Check if user is signed in
+    const user = localStorage.getItem("user");
+    if (!user) {
+      router.push("/auth/sign-in");
+      return;
+    }
+  }, []);
 
   useEffect(() => {
     setIsVisible(true);

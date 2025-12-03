@@ -7,6 +7,9 @@ async fn create_todo(
     pool: web::Data<Pool<Postgres>>,
     todo: web::Json<CreateTodo>,
 ) -> impl Responder {
+    // Defines how to convert into a HTTP response
+    
+    // Insert the new todo into the database
     let result = sqlx::query_as::<_, Todo>(
         "INSERT INTO todos (user_id, system_id, title, completed) 
          VALUES ($1, $2, $3, $4) 
@@ -19,6 +22,7 @@ async fn create_todo(
     .fetch_one(pool.get_ref())
     .await;
 
+    // Handle the result of the database insertion
     match result {
         Ok(todo) => HttpResponse::Created().json(todo),
         Err(e) => {
