@@ -186,7 +186,7 @@ export default function SystemsPage() {
                   onClick={() => router.push(`/system/${system.id}`)}
                   className="flex-1 px-4 py-2 bg-[#A3B087] text-[#31364F] rounded-lg hover:bg-[#b5c59a] transition-all font-semibold"
                 >
-                  View Todos
+                  View System
                 </button>
                 {!system.is_default && (
                   <button
