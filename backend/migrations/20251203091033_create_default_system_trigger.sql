@@ -13,12 +13,6 @@ BEGIN
     -- Capture the generated system ID and store it in the variable
     RETURNING id INTO new_system_id;
     
-    -- Insert a placeholder todo to show the user while real todos are being fetched
-    -- This placeholder will be deleted by the backend and replaced with real API data
-    INSERT INTO todos (user_id, system_id, title, completed)
-    VALUES 
-        (NEW.id, new_system_id, 'Loading public todos...', FALSE);
-    
     -- Return the new user row (required for AFTER INSERT triggers)
     RETURN NEW;
 END;

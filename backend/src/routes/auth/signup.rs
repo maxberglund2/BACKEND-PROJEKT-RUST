@@ -74,13 +74,6 @@ async fn populate_public_todos(
     // Extract the system ID from the tuple, by getting the first element
     let system_id = system.0;
 
-    // Delete the placeholder todo
-    sqlx::query("DELETE FROM todos WHERE user_id = $1 AND system_id = $2")
-        .bind(user_id)
-        .bind(system_id)
-        .execute(pool)
-        .await?;
-
     // Fetch public todos from JSONPlaceholder API
     let client = reqwest::Client::new();
     let response = client
